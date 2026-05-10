@@ -1,0 +1,28 @@
+<svg width="1400" height="820" viewBox="0 0 1400 820" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="820" fill="#0f172a"/>
+  <rect x="52" y="46" width="1296" height="728" rx="16" fill="#111827" stroke="#334155" stroke-width="2"/>
+  <circle cx="88" cy="82" r="9" fill="#ef4444"/>
+  <circle cx="118" cy="82" r="9" fill="#f59e0b"/>
+  <circle cx="148" cy="82" r="9" fill="#22c55e"/>
+  <text x="184" y="88" fill="#94a3b8" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">safe-device-config-push-simulator demo</text>
+
+  <text x="86" y="144" fill="#38bdf8" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">$ curl -X POST http://localhost:8080/config-push -d '{ ... routing change ... }'</text>
+  <text x="86" y="190" fill="#e5e7eb" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">{</text>
+  <text x="118" y="226" fill="#e5e7eb" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">"jobId": "2b03f5d6-0b1d-4c3d-ae52-8d771dc85142",</text>
+  <text x="118" y="262" fill="#e5e7eb" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">"deviceId": "device-sea-001",</text>
+  <text x="118" y="298" fill="#86efac" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">"status": "CONFIRMED",</text>
+  <text x="118" y="334" fill="#e5e7eb" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">"riskLevel": "MEDIUM",</text>
+  <text x="118" y="370" fill="#e5e7eb" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">"message": "Commit confirmed after health checks passed.",</text>
+  <text x="118" y="406" fill="#c4b5fd" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">"netconfOperations": ["lock-candidate", "edit-candidate-config", "commit-confirmed", "confirm-commit"]</text>
+  <text x="86" y="442" fill="#e5e7eb" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">}</text>
+
+  <line x1="86" y1="488" x2="1314" y2="488" stroke="#334155" stroke-width="2"/>
+
+  <text x="86" y="546" fill="#38bdf8" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">$ curl -X POST http://localhost:8080/config-push -d '{ ... next-hop blackhole ... }'</text>
+  <text x="86" y="592" fill="#e5e7eb" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">{</text>
+  <text x="118" y="628" fill="#e5e7eb" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">"jobId": "5fe44036-1f1e-4940-bce7-44f27c613a8e",</text>
+  <text x="118" y="664" fill="#e5e7eb" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">"deviceId": "device-sfo-001",</text>
+  <text x="118" y="700" fill="#fca5a5" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">"status": "ROLLED_BACK",</text>
+  <text x="118" y="736" fill="#e5e7eb" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">"message": "Health checks failed. Rolled back to previous config."</text>
+  <text x="86" y="772" fill="#e5e7eb" font-family="Menlo, Monaco, Consolas, monospace" font-size="22">}</text>
+</svg>

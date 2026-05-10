@@ -1,5 +1,7 @@
 # Safe Device Config Push Simulator
 
+[![CI](https://github.com/yaminipriyakodeboyina/safe-device-config-push-simulator/actions/workflows/ci.yml/badge.svg)](https://github.com/yaminipriyakodeboyina/safe-device-config-push-simulator/actions/workflows/ci.yml)
+
 Safe Device Config Push Simulator is a Java/Spring Boot backend service that simulates safe network device configuration deployment using NETCONF-style device operations, device locking, config diffing, risk classification, commit-confirmed rollout, health checks, rollback, and audit logging.
 
 Recruiters should understand this project in 10 seconds: it is a miniature production-safe network automation system.
@@ -64,6 +66,10 @@ For every config push, the job records the NETCONF-style RPCs that would be sent
 ```
 
 This keeps the project easy to run while still showing the real infrastructure workflow behind safe network automation.
+
+## Demo
+
+![curl demo showing confirmed and rolled back config pushes](docs/demo-curl-output.png)
 
 ## API
 
