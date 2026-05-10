@@ -2,7 +2,10 @@ package com.autonetconfig.lite.dto;
 
 import com.autonetconfig.lite.model.ConfigPushJob;
 import com.autonetconfig.lite.model.JobStatus;
+import com.autonetconfig.lite.model.NetconfOperation;
 import com.autonetconfig.lite.model.RiskLevel;
+
+import java.util.List;
 
 public class ConfigPushResponse {
     private final String jobId;
@@ -11,14 +14,24 @@ public class ConfigPushResponse {
     private final RiskLevel riskLevel;
     private final String diff;
     private final String message;
+    private final List<NetconfOperation> netconfOperations;
 
-    public ConfigPushResponse(String jobId, String deviceId, JobStatus status, RiskLevel riskLevel, String diff, String message) {
+    public ConfigPushResponse(
+            String jobId,
+            String deviceId,
+            JobStatus status,
+            RiskLevel riskLevel,
+            String diff,
+            String message,
+            List<NetconfOperation> netconfOperations
+    ) {
         this.jobId = jobId;
         this.deviceId = deviceId;
         this.status = status;
         this.riskLevel = riskLevel;
         this.diff = diff;
         this.message = message;
+        this.netconfOperations = netconfOperations;
     }
 
     public static ConfigPushResponse from(ConfigPushJob job) {
@@ -28,7 +41,8 @@ public class ConfigPushResponse {
                 job.getStatus(),
                 job.getRiskLevel(),
                 job.getDiff(),
-                job.getMessage()
+                job.getMessage(),
+                job.getNetconfOperations()
         );
     }
 
@@ -54,5 +68,9 @@ public class ConfigPushResponse {
 
     public String getMessage() {
         return message;
+    }
+
+    public List<NetconfOperation> getNetconfOperations() {
+        return netconfOperations;
     }
 }

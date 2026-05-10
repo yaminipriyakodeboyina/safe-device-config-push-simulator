@@ -1,6 +1,6 @@
 # Safe Device Config Push Simulator
 
-Safe Device Config Push Simulator is a Java/Spring Boot backend service that simulates safe network device configuration deployment using device locking, config diffing, risk classification, commit-confirmed rollout, health checks, rollback, and audit logging.
+Safe Device Config Push Simulator is a Java/Spring Boot backend service that simulates safe network device configuration deployment using NETCONF-style device operations, device locking, config diffing, risk classification, commit-confirmed rollout, health checks, rollback, and audit logging.
 
 Recruiters should understand this project in 10 seconds: it is a miniature production-safe network automation system.
 
@@ -15,7 +15,7 @@ Network configuration changes are risky. A bad route, BGP policy, or delete comm
 5. Simulate commit-confirmed
 6. Run health checks
 7. Confirm commit or rollback
-8. Store audit history
+8. Store audit history with the simulated NETCONF RPC transcript
 
 ## Architecture
 
@@ -29,6 +29,7 @@ Config Push API
 Config Orchestrator
   |
   +--> Device Lock Manager
+  +--> Simulated NETCONF Device Client
   +--> Config Diff Engine
   +--> Risk Classifier
   +--> Commit-Confirmed Simulator
@@ -41,9 +42,28 @@ Config Orchestrator
 
 - Java 15 compatible source
 - Spring Boot REST APIs
+- Simulated NETCONF client
 - In-memory stores for jobs, device configs, and audit history
 - JUnit + Spring MockMvc tests
 - Docker
+
+## NETCONF Simulation
+
+The project does not need real routers to run locally. Instead, the orchestrator talks to a `DeviceConfigClient` interface with a simulated NETCONF implementation.
+
+For every config push, the job records the NETCONF-style RPCs that would be sent to a network device:
+
+```text
+<lock> candidate
+<get-config> running
+<edit-config> candidate
+<validate> candidate
+<commit confirmed>
+<commit> or <discard-changes>
+<unlock> candidate
+```
+
+This keeps the project easy to run while still showing the real infrastructure workflow behind safe network automation.
 
 ## API
 
@@ -87,7 +107,14 @@ Example completed response:
   "status": "CONFIRMED",
   "riskLevel": "MEDIUM",
   "diff": "+ set routing-options static route 10.0.0.0/24 next-hop 192.168.1.1\n- set routing-options static route 10.0.0.0/24 next-hop 192.168.1.2",
-  "message": "Commit confirmed after health checks passed."
+  "message": "Commit confirmed after health checks passed.",
+  "netconfOperations": [
+    {
+      "operation": "commit-confirmed",
+      "rpc": "<rpc><commit><confirmed/><confirm-timeout>120</confirm-timeout></commit></rpc>",
+      "executedAt": "2026-05-09T23:26:19Z"
+    }
+  ]
 }
 ```
 
@@ -97,7 +124,7 @@ Example completed response:
 curl http://localhost:8080/audit-log
 ```
 
-The audit log includes the old config, new config, diff, risk level, final status, and timestamps.
+The audit log includes the old config, new config, diff, risk level, final status, timestamps, and simulated NETCONF operations.
 
 ## Device Locking
 
@@ -164,6 +191,7 @@ docker run -p 8080:8080 safe-device-config-push-simulator
 
 - Backend API design
 - Distributed-systems style locking
+- NETCONF-style network device automation
 - Network infrastructure domain knowledge
 - Reliability-focused rollout and rollback design
 - Testable Java service architecture
@@ -171,4 +199,4 @@ docker run -p 8080:8080 safe-device-config-push-simulator
 
 ## Resume Bullet
 
-Built Safe Device Config Push Simulator, a Java/Spring Boot backend service that simulates safe network device configuration deployment with per-device locking, config diffing, rule-based risk classification, commit-confirmed rollout, automated health checks, rollback, and audit logging.
+Built Safe Device Config Push Simulator, a Java/Spring Boot backend service that simulates NETCONF-style network device configuration deployment with per-device locking, config diffing, rule-based risk classification, commit-confirmed rollout, automated health checks, rollback, and audit logging.

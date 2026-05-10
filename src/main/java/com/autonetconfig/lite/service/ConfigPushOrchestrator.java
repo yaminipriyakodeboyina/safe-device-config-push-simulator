@@ -4,8 +4,8 @@ import com.autonetconfig.lite.dto.ConfigPushRequest;
 import com.autonetconfig.lite.model.ConfigPushJob;
 import com.autonetconfig.lite.model.JobStatus;
 import com.autonetconfig.lite.model.RiskLevel;
+import com.autonetconfig.lite.netconf.DeviceConfigClient;
 import com.autonetconfig.lite.store.ConfigPushJobStore;
-import com.autonetconfig.lite.store.DeviceConfigStore;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -23,7 +23,7 @@ public class ConfigPushOrchestrator {
     private final CommitConfirmedSimulator commitConfirmedSimulator;
     private final HealthCheckEngine healthCheckEngine;
     private final RollbackManager rollbackManager;
-    private final DeviceConfigStore deviceConfigStore;
+    private final DeviceConfigClient deviceConfigClient;
     private final ConfigPushJobStore jobStore;
 
     public ConfigPushOrchestrator(
@@ -34,7 +34,7 @@ public class ConfigPushOrchestrator {
             CommitConfirmedSimulator commitConfirmedSimulator,
             HealthCheckEngine healthCheckEngine,
             RollbackManager rollbackManager,
-            DeviceConfigStore deviceConfigStore,
+            DeviceConfigClient deviceConfigClient,
             ConfigPushJobStore jobStore
     ) {
         this.validator = validator;
@@ -44,7 +44,7 @@ public class ConfigPushOrchestrator {
         this.commitConfirmedSimulator = commitConfirmedSimulator;
         this.healthCheckEngine = healthCheckEngine;
         this.rollbackManager = rollbackManager;
-        this.deviceConfigStore = deviceConfigStore;
+        this.deviceConfigClient = deviceConfigClient;
         this.jobStore = jobStore;
     }
 
@@ -81,24 +81,28 @@ public class ConfigPushOrchestrator {
         try {
             pauseForReadableStatus();
 
-            String oldConfig = deviceConfigStore.getConfig(job.getDeviceId());
+            deviceConfigClient.lockCandidate(job.getDeviceId(), job);
+            String oldConfig = deviceConfigClient.getRunningConfig(job.getDeviceId(), job);
             String newConfig = diffEngine.applyChange(oldConfig, job.getConfigChange());
             String diff = diffEngine.generateDiff(oldConfig, newConfig);
             job.setOldConfig(oldConfig);
             job.setNewConfig(newConfig);
             job.setDiff(diff);
             job.setStatus(JobStatus.DIFF_GENERATED);
+            deviceConfigClient.editCandidateConfig(job.getDeviceId(), newConfig, job);
+            deviceConfigClient.validateCandidate(job.getDeviceId(), job);
 
             RiskLevel riskLevel = riskClassifier.classify(job.getConfigChange());
             job.setRiskLevel(riskLevel);
             job.setStatus(JobStatus.RISK_CLASSIFIED);
 
+            deviceConfigClient.commitConfirmed(job.getDeviceId(), job);
             commitConfirmedSimulator.stage(job);
             boolean healthy = healthCheckEngine.passes(job.getConfigChange(), riskLevel);
 
             if (healthy) {
-                deviceConfigStore.putConfig(job.getDeviceId(), newConfig);
                 job.setStatus(JobStatus.HEALTH_CHECK_PASSED);
+                deviceConfigClient.confirmCommit(job.getDeviceId(), job);
                 commitConfirmedSimulator.confirm(job);
             } else {
                 job.setStatus(JobStatus.HEALTH_CHECK_FAILED);
@@ -108,6 +112,7 @@ public class ConfigPushOrchestrator {
             job.setStatus(JobStatus.FAILED);
             job.setMessage(exception.getMessage());
         } finally {
+            deviceConfigClient.unlockCandidate(job.getDeviceId(), job);
             job.setCompletedAt(Instant.now());
             lockManager.unlock(job.getDeviceId());
             jobStore.save(job);

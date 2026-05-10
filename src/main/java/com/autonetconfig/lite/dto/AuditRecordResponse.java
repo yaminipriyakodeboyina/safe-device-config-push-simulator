@@ -2,9 +2,11 @@ package com.autonetconfig.lite.dto;
 
 import com.autonetconfig.lite.model.ConfigPushJob;
 import com.autonetconfig.lite.model.JobStatus;
+import com.autonetconfig.lite.model.NetconfOperation;
 import com.autonetconfig.lite.model.RiskLevel;
 
 import java.time.Instant;
+import java.util.List;
 
 public class AuditRecordResponse {
     private final String jobId;
@@ -16,6 +18,7 @@ public class AuditRecordResponse {
     private final JobStatus finalStatus;
     private final Instant createdAt;
     private final Instant completedAt;
+    private final List<NetconfOperation> netconfOperations;
 
     public AuditRecordResponse(
             String jobId,
@@ -26,7 +29,8 @@ public class AuditRecordResponse {
             RiskLevel riskLevel,
             JobStatus finalStatus,
             Instant createdAt,
-            Instant completedAt
+            Instant completedAt,
+            List<NetconfOperation> netconfOperations
     ) {
         this.jobId = jobId;
         this.deviceId = deviceId;
@@ -37,6 +41,7 @@ public class AuditRecordResponse {
         this.finalStatus = finalStatus;
         this.createdAt = createdAt;
         this.completedAt = completedAt;
+        this.netconfOperations = netconfOperations;
     }
 
     public static AuditRecordResponse from(ConfigPushJob job) {
@@ -49,7 +54,8 @@ public class AuditRecordResponse {
                 job.getRiskLevel(),
                 job.getStatus(),
                 job.getCreatedAt(),
-                job.getCompletedAt()
+                job.getCompletedAt(),
+                job.getNetconfOperations()
         );
     }
 
@@ -87,5 +93,9 @@ public class AuditRecordResponse {
 
     public Instant getCompletedAt() {
         return completedAt;
+    }
+
+    public List<NetconfOperation> getNetconfOperations() {
+        return netconfOperations;
     }
 }

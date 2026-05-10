@@ -1,6 +1,8 @@
 package com.autonetconfig.lite.model;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ConfigPushJob {
     private final String jobId;
@@ -15,6 +17,7 @@ public class ConfigPushJob {
     private volatile String newConfig;
     private volatile String diff;
     private volatile String message;
+    private final List<NetconfOperation> netconfOperations = new CopyOnWriteArrayList<>();
 
     public ConfigPushJob(String jobId, String deviceId, String configChange, String changeType) {
         this.jobId = jobId;
@@ -99,5 +102,13 @@ public class ConfigPushJob {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public List<NetconfOperation> getNetconfOperations() {
+        return netconfOperations;
+    }
+
+    public void addNetconfOperation(NetconfOperation operation) {
+        netconfOperations.add(operation);
     }
 }
