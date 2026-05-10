@@ -202,7 +202,3 @@ docker run -p 8080:8080 safe-device-config-push-simulator
 - Reliability-focused rollout and rollback design
 - Testable Java service architecture
 - Production automation thinking without requiring real network devices
-
-## Resume Bullet
-
-Built Safe Device Config Push Simulator, a Java/Spring Boot backend service that simulates NETCONF-style network device configuration deployment with per-device locking, config diffing, rule-based risk classification, commit-confirmed rollout, automated health checks, rollback, and audit logging.
